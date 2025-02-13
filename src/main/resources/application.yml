@@ -1,0 +1,39 @@
+spring:
+    application:
+        name: kafka-spring
+        cloud:
+            stream:
+                binders:
+                    kafka-crs-binder:
+                        type: kafka
+                        environment.spring.cloud.stream.kafka:
+                            brokers: localhost:9092
+                            autoCreateTopics: true
+                            autoAddPartitions: true
+                        deserializationExceptionHandler: logAndContinue
+                default-binder: kafka-crs-binder
+                kafka:
+                    notification-event-in-0:
+                        consumer:
+                            resetOffsets: true
+                            startOffsets: latest
+                            enableDlq: false
+                            configuration:
+                                max.poll.records: 1
+                                max.poll.interval.ms: 1000
+                bindings:
+                    notification-event-out-0:
+                        binder: kafka-crs-binder
+                        destination: crs-notification-event
+                        contentType: application:/json
+                    notification-event-in-0:
+                        binder: kafka-crs-binder
+                        destination: crs-notification-event
+                        contentType: application:/json
+                        group: kafka-spring@crs-notices-notification
+                        consumer:
+                            maxAttempts: 1
+                            concurrency: 1
+
+
+
